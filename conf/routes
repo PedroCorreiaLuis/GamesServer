@@ -1,0 +1,9 @@
+
+#CREATES A PLAYER
+POST    /player                                             api.controllers.PlayerController.createPlayer
+
+#PLAYER JOINS A GAME
+POST    /game/:gameID/player/:playerID                      api.controllers.GameController.joinGame(gameID: Int, playerID:Int)
+
+#PLAYER SUBMITS AN ACTION
+POST    /game/:gameID/session/:sessionID/player/:playerID   api.controllers.GameController.sendAction(gameID: Int, sessionID:Int, playerID:Int)
