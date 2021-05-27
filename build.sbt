@@ -5,8 +5,8 @@ version := "0.1"
 scalaVersion := "2.13.6"
 
 lazy val gamesServer: Project = (project
-  in file(".")
-  settings (name := "GamesServer"))
+  in file("."))
+  .settings(name := "GamesServer")
 
 libraryDependencies ++= Seq(
   "com.typesafe.play" %% "play" % "2.8.8",

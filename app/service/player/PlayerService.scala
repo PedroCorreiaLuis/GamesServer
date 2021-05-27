@@ -2,11 +2,13 @@ package service.player
 
 import akka.actor.{Actor, ActorRef}
 import api.model.PlayerDTO
-import service.player.PlayerService.{Player, createPlayer, spawnAccount}
+import service.account.AccountManager.PlayerTransactionRequest
+import service.player.PlayerService.{createPlayer, spawnAccount, Player}
 
 import java.util.UUID
 
 class PlayerService(accountManagerRef: ActorRef) extends Actor {
+
   override def receive: Receive = {
     case playerDTO: PlayerDTO =>
       val newPlayer: Player = createPlayer(playerDTO)
@@ -15,11 +17,7 @@ class PlayerService(accountManagerRef: ActorRef) extends Actor {
 }
 
 object PlayerService {
-  case class Player(firstName: String,
-                    lastName: String,
-                    username: String,
-                    age: Int,
-                    playerID: UUID)
+  case class Player(firstName: String, lastName: String, username: String, age: Int, playerID: UUID)
 
   def createPlayer(playerDTO: PlayerDTO): Player = {
     Player(
@@ -32,7 +30,7 @@ object PlayerService {
   }
 
   def spawnAccount(player: Player, accountManagerRef: ActorRef): Unit = {
-    accountManagerRef ! player
+    accountManagerRef ! PlayerTransactionRequest(player.playerID, None)
   }
 
 }

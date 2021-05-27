@@ -4,16 +4,17 @@ import akka.actor.Actor
 
 import java.util.UUID
 
-class PlayerFunds extends Actor {
+class PlayerTransaction extends Actor {
   import service.account.AccountManager.PlayerFundsRequest
-  import PlayerFunds._
+  import PlayerTransaction._
+
   override def receive: Receive = {
     case playerFundsRequest: PlayerFundsRequest =>
       sender() ! toPlayerWithFundsReply(playerFundsRequest)
   }
 }
 
-object PlayerFunds {
+object PlayerTransaction {
   import service.account.AccountManager._
   case class PlayerWithFunds(playerIdentifier: UUID, balance: Int)
 
@@ -22,7 +23,7 @@ object PlayerFunds {
   ): PlayerFundsReply = {
     PlayerFundsReply(
       PlayerWithFunds(
-        playerIdentifier = playerRequest.player.playerID,
+        playerIdentifier = playerRequest.playerId,
         balance = (for {
           balance <- playerRequest.balance
           betAmount <- playerRequest.betAmount

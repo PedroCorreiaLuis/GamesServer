@@ -7,11 +7,13 @@ import akka.util.Timeout
 import java.util.UUID
 import scala.concurrent.{ExecutionContext, Future}
 import scala.concurrent.duration.DurationInt
+import scala.language.postfixOps
 
 class GameManager extends Actor {
   import GameManager._
   implicit val timeout: Timeout = Timeout(1 second)
   implicit val executionContext: ExecutionContext = context.dispatcher
+
   override def receive: Receive = {
     case request: GameCreationRequest =>
       val originalSender: ActorRef = sender()
