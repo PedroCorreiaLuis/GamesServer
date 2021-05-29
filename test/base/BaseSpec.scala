@@ -1,6 +1,6 @@
 package base
 
-import org.scalatest.flatspec.AsyncFlatSpec
 import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpecLike
 
-trait BaseSpec extends AsyncFlatSpec with Matchers
+trait BaseSpec extends AnyWordSpecLike with Matchers

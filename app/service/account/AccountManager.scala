@@ -22,7 +22,7 @@ class AccountManager extends Actor {
   override def receive: Receive = delegateFundsMovement
 
   def delegateFundsMovement: Receive = {
-
+    //TODO cant handle multiple request at the same time with the same id, strange behaviour in AccountDB
     case PlayerTransactionRequest(playerId, amount) =>
       //TODO add more actors to improve responsiveness
       val playerFundsActor: ActorRef = context.actorOf(Props[PlayerTransaction])
@@ -35,7 +35,7 @@ class AccountManager extends Actor {
         playerFundsActor ? PlayerFundsRequest(
           playerId = playerId,
           balance = playerBalance,
-          betAmount = amount
+          amount = amount
         )
       }
 
@@ -72,7 +72,7 @@ object AccountManager {
 
   case class PlayerTransactionRequest(playerId: UUID, amount: Option[Int])
   case class ValidateBet(playerId: UUID, betAmount: Int)
-  case class PlayerFundsRequest(playerId: UUID, balance: Option[Int], betAmount: Option[Int])
+  case class PlayerFundsRequest(playerId: UUID, balance: Option[Int], amount: Option[Int])
   case class PlayerFundsReply(playerWithFunds: PlayerWithFunds)
 
   val PLAYER_NOT_FOUND: String = "Player doesn't exist"

@@ -8,7 +8,6 @@ class AccountDB extends Actor with ActorLogging {
   override def receive: Receive = online(Map.empty[UUID, Int])
   import service.account.AccountDB._
 
-  //TODO cant handle multiple request at the same time with the same id, strange behaviour
   def online(database: Map[UUID, Int]): Receive = {
     case Get(key) =>
       log.info(s"Checking balance of: $key")

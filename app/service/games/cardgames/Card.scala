@@ -11,4 +11,5 @@ object Card {
       name = s"${cardType.toString} of ${suit.toString}"
     )
   }
+
 }

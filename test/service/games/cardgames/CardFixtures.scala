@@ -10,6 +10,6 @@ object CardFixtures {
   val kingOfClubs: Card = Card(Clubs, King)
   val tenOfClubs: Card = Card(Clubs, Ten)
 
-  val hand1 = List(tenOfClubs, kingOfClubs)
-  val hand2 = List(aceOfDiamonds, kingOfClubs)
+  val hand1: Seq[Card] = List(tenOfClubs, kingOfClubs)
+  val hand2: Seq[Card] = List(aceOfDiamonds, kingOfClubs)
 }

@@ -26,7 +26,7 @@ object PlayerTransaction {
         playerIdentifier = playerRequest.playerId,
         balance = (for {
           balance <- playerRequest.balance
-          betAmount <- playerRequest.betAmount
+          betAmount <- playerRequest.amount
         } yield {
           balance + betAmount
         }).getOrElse(1000)
