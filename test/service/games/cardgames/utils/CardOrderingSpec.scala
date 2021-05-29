@@ -22,6 +22,7 @@ class CardOrderingSpec extends BaseSpec {
     }
 
     "correctly sort a Hands by their values" in {
+      List(hand1, hand2).sorted(CardOrdering.compareSeq).reverse shouldBe List(hand2, hand1)
       List(hand2, hand1).sorted(CardOrdering.compareSeq).reverse shouldBe List(hand2, hand1)
     }
 
