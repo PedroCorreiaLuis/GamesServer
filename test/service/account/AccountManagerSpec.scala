@@ -9,7 +9,7 @@ import java.util.UUID
 import scala.language.postfixOps
 
 class AccountManagerSpec extends TestKit(ActorSystem("AccountManagerSpec")) with ActorSpec {
-
+//TODO remove Thread.sleep when bug is fixed
   "Account manager" should {
     "transaction denied with no player found " in {
       val uuid: UUID = UUID.randomUUID()

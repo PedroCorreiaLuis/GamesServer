@@ -17,7 +17,8 @@ class AccountManager extends Actor {
   implicit val timeout: Timeout = Timeout(1 second)
   implicit val executionContext: ExecutionContext = context.dispatcher
 
-  private val accountDB: ActorRef = context.actorOf(Props[AccountDB])
+  private val accountDBActor: ActorRef = context.actorOf(Props[AccountDB])
+  private val playerFundsActor: ActorRef = context.actorOf(Props[PlayerTransaction])
 
   override def receive: Receive = delegateFundsMovement
 
@@ -25,9 +26,8 @@ class AccountManager extends Actor {
     //TODO cant handle multiple request at the same time with the same id, strange behaviour in AccountDB
     case PlayerTransactionRequest(playerId, amount) =>
       //TODO add more actors to improve responsiveness
-      val playerFundsActor: ActorRef = context.actorOf(Props[PlayerTransaction])
 
-      val dbResponse: Future[Any] = accountDB ? Get(playerId)
+      val dbResponse: Future[Any] = accountDBActor ? Get(playerId)
 
       val dbTypedResponse: Future[Option[Int]] = dbResponse.mapTo[Option[Int]]
 
@@ -49,11 +49,11 @@ class AccountManager extends Actor {
         )
       }
 
-      futureResponse.pipeTo(accountDB)
+      futureResponse.pipeTo(accountDBActor)
 
     case ValidateBet(playerID, betAmount) =>
       val originalSender: ActorRef = sender()
-      val dbResponse: Future[Any] = accountDB ? Get(playerID)
+      val dbResponse: Future[Any] = accountDBActor ? Get(playerID)
       val dbTypedResponse: Future[Option[Int]] = dbResponse.mapTo[Option[Int]]
       val typedReply: Future[TransactionReply] = dbTypedResponse.map {
         case None => TransactionDenied(PLAYER_NOT_FOUND)

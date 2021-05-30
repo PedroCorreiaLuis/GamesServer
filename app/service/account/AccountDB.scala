@@ -4,6 +4,7 @@ import akka.actor.{Actor, ActorLogging}
 
 import java.util.UUID
 
+//TODO abstract this
 class AccountDB extends Actor with ActorLogging {
   override def receive: Receive = online(Map.empty[UUID, Int])
   import service.account.AccountDB._
