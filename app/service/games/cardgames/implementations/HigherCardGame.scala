@@ -22,7 +22,7 @@ case class HigherCardGame(player1: UUID, player2: UUID, numberOfCards: Int) {
 object HigherCardGame {
   case class PlayerWithHand(playerId: UUID, hand: Hand)
   sealed trait GameResult
-  case class Tie(hand: Hand) extends GameResult
+  case class Tie(playersWithHands: List[PlayerWithHand]) extends GameResult
   case class ResultWithWinner(winner: PlayerWithHand, loser: PlayerWithHand) extends GameResult
 
   def dealHands(players: List[UUID], hands: Iterator[Hand]): List[PlayerWithHand] = {
@@ -34,7 +34,7 @@ object HigherCardGame {
     val multipleHands: List[Seq[Card]] = playersWithHands.map(_.hand.cards).sorted(CardOrdering.compareSeq).reverse
 
     multipleHands match {
-      case List(player1Cards, player2Cards) if player1Cards == player2Cards => Tie(Hand(player1Cards: _*))
+      case List(player1Cards, player2Cards) if player1Cards == player2Cards => Tie(playersWithHands)
       case List(firstHand, _) =>
         val (winningPlayers: List[PlayerWithHand], losingPlayers: List[PlayerWithHand]) =
           playersWithHands.partition(_.hand == firstHand)

@@ -3,6 +3,7 @@ package service.games
 import akka.actor.{Actor, ActorRef}
 import service.account.AccountManager.PlayerTransactionRequest
 import service.games.cardgames.implementations.{CardGameDefinition, HigherCardGame}
+import akka.actor.PoisonPill
 
 import java.util.UUID
 
@@ -25,8 +26,11 @@ class GameEngine(players: List[UUID], gameId: Int, accountManager: ActorRef) ext
       }
 
       val gameResults: HigherCardGame.GameResult = game.play()
-      sender() ! gameResults
-      context.become(waiting(playerActions = Nil, gameResult = gameResults, gameDefinition = gameDefinition))
+
+      {
+        context.become(waiting(playerActions = Nil, gameResult = gameResults, gameDefinition = gameDefinition))
+        gameResults
+      }
 
   }
 
@@ -36,7 +40,6 @@ class GameEngine(players: List[UUID], gameId: Int, accountManager: ActorRef) ext
     gameDefinition: CardGameDefinition
   ): Receive = {
     case playerAction: PlayerAction =>
-      //todo validate action
       val currentPlayerActions: List[PlayerAction] = playerActions :+ playerAction
 
       if (currentPlayerActions.length == 2) {
@@ -45,7 +48,7 @@ class GameEngine(players: List[UUID], gameId: Int, accountManager: ActorRef) ext
         val playerAction2: PlayerAction = currentPlayerActions.last
 
         (playerAction1, playerAction2) match {
-          case (PlayerAction(FOLD, player1), PlayerAction(FOLD, player2)) =>
+          case (PlayerAction(FOLD, player1, _, _), PlayerAction(FOLD, player2, _, _)) =>
             accountManager ! PlayerTransactionRequest(
               playerId = player1,
               amount = Some(-gameDefinition.doubleFoldValue)
@@ -56,7 +59,7 @@ class GameEngine(players: List[UUID], gameId: Int, accountManager: ActorRef) ext
               amount = Some(-gameDefinition.doubleFoldValue)
             )
 
-          case (PlayerAction(FOLD, player1), PlayerAction(PLAY, player2)) =>
+          case (PlayerAction(FOLD, player1, _, _), PlayerAction(PLAY, player2, _, _)) =>
             accountManager ! PlayerTransactionRequest(
               playerId = player1,
               amount = Some(-gameDefinition.singleFoldValue)
@@ -67,7 +70,7 @@ class GameEngine(players: List[UUID], gameId: Int, accountManager: ActorRef) ext
               amount = Some(gameDefinition.singleFoldValue)
             )
 
-          case (PlayerAction(PLAY, player1), PlayerAction(FOLD, player2)) =>
+          case (PlayerAction(PLAY, player1, _, _), PlayerAction(FOLD, player2, _, _)) =>
             accountManager ! PlayerTransactionRequest(
               playerId = player1,
               amount = Some(gameDefinition.singleFoldValue)
@@ -95,8 +98,9 @@ class GameEngine(players: List[UUID], gameId: Int, accountManager: ActorRef) ext
             }
         }
 
-        //TODO add why to "unblock" APPManager
-        context.unbecome()
+        sender() ! Remove(gameId = playerAction1.gameId, sessionId = playerAction1.sessionId)
+
+        self ! PoisonPill
 
       } else {
         context.become(waiting(currentPlayerActions, gameResult, gameDefinition))
@@ -108,4 +112,5 @@ class GameEngine(players: List[UUID], gameId: Int, accountManager: ActorRef) ext
 
 object GameEngine {
   object Start
+  case class Remove(gameId: Int, sessionId: UUID)
 }

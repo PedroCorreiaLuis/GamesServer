@@ -8,7 +8,10 @@ lazy val gamesServer: Project = (project
   in file("."))
   .settings(name := "GamesServer")
 
+resolvers += Resolver.sonatypeRepo("snapshots")
+
 libraryDependencies ++= Seq(
+  "com.google.inject" % "guice" % "5.0.1",
   "com.typesafe.play" %% "play" % "2.8.8",
   "com.typesafe.akka" %% "akka-actor" % "2.6.14",
   "org.scalacheck" %% "scalacheck" % "1.14.0",

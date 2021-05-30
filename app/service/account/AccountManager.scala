@@ -56,9 +56,10 @@ class AccountManager extends Actor {
       val dbResponse: Future[Any] = accountDBActor ? Get(playerID)
       val dbTypedResponse: Future[Option[Int]] = dbResponse.mapTo[Option[Int]]
       val typedReply: Future[TransactionReply] = dbTypedResponse.map {
-        case None => TransactionDenied(PLAYER_NOT_FOUND)
+        case None => TransactionDenied(playerId = playerID, message = PLAYER_NOT_FOUND)
         case Some(balance) =>
-          if (balance >= betAmount) TransactionSupported else TransactionDenied(INSUFFICIENT_FUNDS)
+          if (balance >= betAmount) TransactionSupported(playerId = playerID)
+          else TransactionDenied(playerId = playerID, message = INSUFFICIENT_FUNDS)
       }
 
       typedReply.pipeTo(originalSender)
@@ -66,9 +67,12 @@ class AccountManager extends Actor {
 }
 
 object AccountManager {
-  sealed trait TransactionReply
-  case object TransactionSupported extends TransactionReply
-  case class TransactionDenied(message: String) extends TransactionReply
+
+  sealed trait TransactionReply {
+    val playerId: UUID
+  }
+  case class TransactionSupported(override val playerId: UUID) extends TransactionReply
+  case class TransactionDenied(override val playerId: UUID, message: String) extends TransactionReply
 
   case class PlayerTransactionRequest(playerId: UUID, amount: Option[Int])
   case class ValidateBet(playerId: UUID, betAmount: Int)

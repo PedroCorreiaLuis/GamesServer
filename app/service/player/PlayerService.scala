@@ -18,7 +18,7 @@ class PlayerService(accountManagerRef: ActorRef) extends Actor {
 
 object PlayerService {
   case class PlayerCreation(firstName: String, lastName: String, username: String, age: Int, playerID: UUID)
-  case class PlayerAction(action: String, playerId: UUID)
+  case class PlayerAction(action: String, playerId: UUID, gameId: Int, sessionId: UUID)
   val FOLD: String = "fold"
   val PLAY: String = "play"
 
